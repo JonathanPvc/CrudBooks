@@ -2,6 +2,7 @@ package com.example.demo.controllers;
 
 import ch.qos.logback.classic.helpers.MDCInsertingServletFilter;
 import com.example.demo.entities.Book;
+import com.example.demo.services.BookService;
 import com.example.demo.services.BookServiceImpl;
 import org.hibernate.grammars.hql.HqlParser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +18,12 @@ import java.util.Optional;
 public class BookController {
 
     @Autowired
-    BookServiceImpl bookServiceImpl;
+    BookService bookService;
 
     @PostMapping
     public ResponseEntity <Book> saveBook(@RequestBody Book book){
         try {
-            Book saveBook = bookServiceImpl.saveBook(book);
+            Book saveBook = bookService.saveBook(book);
             return new ResponseEntity<>(saveBook, HttpStatus.OK);
         }
         catch (Exception e){
@@ -33,7 +34,7 @@ public class BookController {
     @PutMapping
     public ResponseEntity <Book> updateBook(@RequestBody Book book){
         try {
-            Book saveBook = bookServiceImpl.updateBook(book);
+            Book saveBook = bookService.updateBook(book);
             return new ResponseEntity<>(saveBook, HttpStatus.OK);
         }
         catch (Exception e){
@@ -43,21 +44,21 @@ public class BookController {
 
     @GetMapping
     public ResponseEntity <List<Book>> getAllBooks(){
-        return new ResponseEntity<>(bookServiceImpl.getBooks(),HttpStatus.OK);
+        return new ResponseEntity<>(bookService.getBooks(),HttpStatus.OK);
 
 }
     @GetMapping("/{id}")
     public ResponseEntity <Book> getBookById(@PathVariable Long id){
-        Optional<Book> book = bookServiceImpl.getBookById(id);
+        Optional<Book> book = bookService.getBookById(id);
         return book.map(value -> new ResponseEntity<>(value , HttpStatus.OK)).orElseGet(() ->
             new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity <Book> deleteBook(@PathVariable Long id){
-        Optional<Book> book = bookServiceImpl.getBookById(id);
+        Optional<Book> book = bookService.getBookById(id);
         if (book.isPresent()){
-            bookServiceImpl.deleteBook(book.get().getId());
+            bookService.deleteBook(book.get().getId());
             return new ResponseEntity<>(HttpStatus.OK);
 
         }else {
