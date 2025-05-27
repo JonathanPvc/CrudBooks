@@ -10,8 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
-@RestController("/book")
+@RestController
+@RequestMapping("/book")
 public class BookController {
 
     @Autowired
@@ -44,6 +46,27 @@ public class BookController {
         return new ResponseEntity<>(bookServiceImpl.getBooks(),HttpStatus.OK);
 
 }
+    @GetMapping("/{id}")
+    public ResponseEntity <Book> getBookById(@PathVariable Long id){
+        Optional<Book> book = bookServiceImpl.getBookById(id);
+        return book.map(value -> new ResponseEntity<>(value , HttpStatus.OK)).orElseGet(() ->
+            new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity <Book> deleteBook(@PathVariable Long id){
+        Optional<Book> book = bookServiceImpl.getBookById(id);
+        if (book.isPresent()){
+            bookServiceImpl.deleteBook(book.get().getId());
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        }else {
+            return  new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+    }
+
+
 }
 
 
